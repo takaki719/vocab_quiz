@@ -1,0 +1,6 @@
+.claude.json
+.claude/
+.cursor/
+CLAUDE.md
+.next/
+node_modules/

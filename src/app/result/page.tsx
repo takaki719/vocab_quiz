@@ -43,6 +43,12 @@ export default function Result() {
     router.push('/');
   };
 
+  const handleClearReviewQuestions = () => {
+    // 復習問題をクリア
+    localStorage.removeItem('vocab-quiz-incorrect-answers');
+    setHasIncorrectAnswers(false);
+  };
+
   if (!result) {
     return (
       <div className="max-w-lg mx-auto text-center">
@@ -61,6 +67,7 @@ export default function Result() {
         onReviewMode={handleReviewMode}
         onHome={handleHome}
         hasIncorrectAnswers={hasIncorrectAnswers}
+        onClearReviewQuestions={handleClearReviewQuestions}
       />
 
       {/* 詳細結果（オプション） */}

@@ -6,13 +6,15 @@ interface ResultStatsProps {
   onReviewMode: () => void;
   onHome: () => void;
   hasIncorrectAnswers: boolean;
+  onClearReviewQuestions?: () => void;
 }
 
 export default function ResultStats({ 
   result, 
   onReviewMode, 
   onHome, 
-  hasIncorrectAnswers 
+  hasIncorrectAnswers,
+  onClearReviewQuestions
 }: ResultStatsProps) {
   const getScoreColor = (accuracy: number) => {
     if (accuracy >= 80) return 'text-green-600';
@@ -68,6 +70,15 @@ export default function ResultStats({
         <Button onClick={onHome} variant="secondary" className="w-full">
           🏠 ホームへ戻る
         </Button>
+        {hasIncorrectAnswers && onClearReviewQuestions && (
+          <Button 
+            onClick={onClearReviewQuestions} 
+            variant="secondary" 
+            className="w-full text-red-600 hover:text-red-700"
+          >
+            🗑️ 復習問題をクリア
+          </Button>
+        )}
       </div>
 
       {result.accuracy === 100 && (

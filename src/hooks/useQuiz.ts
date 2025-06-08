@@ -73,6 +73,11 @@ export function useQuiz(reviewMode: boolean = false) {
       correctAnswers: newCorrectAnswers
     }));
 
+    // 間違いの場合はすぐに復習問題として保存
+    if (!isCorrect) {
+      saveIncorrectAnswer(currentQuestion);
+    }
+
     // フィードバックを表示
     setFeedback({
       show: true,
@@ -97,6 +102,9 @@ export function useQuiz(reviewMode: boolean = false) {
       userAnswers: newUserAnswers,
       correctAnswers: newCorrectAnswers
     }));
+
+    // すぐに復習問題として保存
+    saveIncorrectAnswer(currentQuestion);
 
     // フィードバックを表示
     setFeedback({
@@ -125,7 +133,23 @@ export function useQuiz(reviewMode: boolean = false) {
     }
   };
 
-  // 間違った問題を保存
+  // 間違った問題を即座に保存
+  const saveIncorrectAnswer = (question: VocabQuestion) => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    let incorrectQuestions: VocabQuestion[] = saved ? JSON.parse(saved) : [];
+    
+    // 重複を避けるため、同じ問題が既に存在するかチェック
+    const exists = incorrectQuestions.some(q => 
+      q.answer === question.answer && q.sentence === question.sentence
+    );
+    
+    if (!exists) {
+      incorrectQuestions.push(question);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(incorrectQuestions));
+    }
+  };
+
+  // 間違った問題を保存（クイズ完了時用・既存互換性のため残す）
   const saveIncorrectAnswers = () => {
     const incorrectQuestions = quizState.questions.filter((_, index) => 
       !quizState.correctAnswers[index]

@@ -15,10 +15,20 @@ export default function Home() {
       if (saved) {
         const questions = JSON.parse(saved);
         setHasReviewQuestions(questions.length > 0);
+      } else {
+        setHasReviewQuestions(false);
       }
     };
 
     checkReviewQuestions();
+
+    // ページがフォーカスされた時に再チェック（他のページから戻ってきた時）
+    const handleFocus = () => checkReviewQuestions();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const startNormalQuiz = () => {

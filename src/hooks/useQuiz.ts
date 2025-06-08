@@ -181,6 +181,20 @@ export function useQuiz(reviewMode: boolean = false) {
     return saved ? JSON.parse(saved).length > 0 : false;
   };
 
+  // 現在の統計を取得
+  const getCurrentStats = () => {
+    const answeredQuestions = quizState.currentQuestionIndex;
+    const correctCount = quizState.correctAnswers.slice(0, answeredQuestions).filter(Boolean).length;
+    const accuracy = answeredQuestions > 0 ? Math.round((correctCount / answeredQuestions) * 100) : 0;
+    
+    return {
+      answered: answeredQuestions,
+      correct: correctCount,
+      accuracy,
+      total: quizState.questions.length
+    };
+  };
+
   // クイズをリセット
   const resetQuiz = () => {
     setQuizState({
@@ -204,6 +218,7 @@ export function useQuiz(reviewMode: boolean = false) {
     skipQuestion,
     nextQuestion,
     getResult,
+    getCurrentStats,
     hasIncorrectAnswers,
     resetQuiz
   };

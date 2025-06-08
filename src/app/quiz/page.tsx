@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuiz } from '@/hooks/useQuiz';
 import QuizCard from '@/components/QuizCard';
 import ProgressBar from '@/components/ProgressBar';
+import CurrentStats from '@/components/CurrentStats';
 
 export default function Quiz() {
   const router = useRouter();
@@ -19,7 +20,8 @@ export default function Quiz() {
     submitAnswer,
     skipQuestion,
     nextQuestion,
-    getResult
+    getResult,
+    getCurrentStats
   } = useQuiz(reviewMode);
 
   // クイズが完了したら結果ページへ
@@ -86,6 +88,8 @@ export default function Quiz() {
           current={quizState.currentQuestionIndex + 1} 
           total={quizState.questions.length}
         />
+        
+        <CurrentStats {...getCurrentStats()} />
       </div>
 
       <QuizCard

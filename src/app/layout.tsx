@@ -29,7 +29,7 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="mt-auto py-6 text-center text-gray-500 text-sm">
-            <p>© 2024 Vocab Quiz App - Built with Next.js</p>
+            <p>2025 Vocab Quiz App</p>
           </footer>
         </div>
       </body>

@@ -23,7 +23,7 @@ export function useQuiz(reviewMode: boolean = false) {
     isCorrect: boolean;
     correctAnswer?: string;
   }>({ show: false, isCorrect: false });
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(10);
   const [isTimerActive, setIsTimerActive] = useState(false);
 
   // クイズの初期化

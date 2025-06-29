@@ -7,6 +7,8 @@ import Button from '@/components/Button';
 export default function Home() {
   const router = useRouter();
   const [hasReviewQuestions, setHasReviewQuestions] = useState(false);
+  const [timerEnabled, setTimerEnabled] = useState(true);
+  const [timerDuration, setTimerDuration] = useState(30);
 
   useEffect(() => {
     // 復習可能な問題があるかチェック
@@ -32,11 +34,24 @@ export default function Home() {
   }, []);
 
   const startNormalQuiz = () => {
-    router.push('/quiz');
+    const params = new URLSearchParams();
+    if (!timerEnabled) {
+      params.set('timer', 'false');
+    } else {
+      params.set('duration', timerDuration.toString());
+    }
+    const url = params.toString() ? `/quiz?${params.toString()}` : '/quiz';
+    router.push(url);
   };
 
   const startReviewQuiz = () => {
-    router.push('/quiz?mode=review');
+    const params = new URLSearchParams({ mode: 'review' });
+    if (!timerEnabled) {
+      params.set('timer', 'false');
+    } else {
+      params.set('duration', timerDuration.toString());
+    }
+    router.push(`/quiz?${params.toString()}`);
   };
 
   return (
@@ -53,6 +68,47 @@ export default function Home() {
         </div>
 
         <div className="space-y-4">
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-gray-700">
+                ⏰ タイマー機能
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={timerEnabled}
+                  onChange={(e) => setTimerEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+            {timerEnabled && (
+              <div className="mb-3">
+                <label className="block text-xs font-medium text-gray-600 mb-2">
+                  制限時間: {timerDuration}秒
+                </label>
+                <input
+                  type="range"
+                  min="5"
+                  max="60"
+                  step="5"
+                  value={timerDuration}
+                  onChange={(e) => setTimerDuration(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>5秒</span>
+                  <span>30秒</span>
+                  <span>60秒</span>
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              {timerEnabled ? `各問題${timerDuration}秒の制限時間があります` : 'タイマーなしでじっくり考えられます'}
+            </p>
+          </div>
+          
           <Button onClick={startNormalQuiz} className="w-full">
             ▶ 通常モードで始める
           </Button>

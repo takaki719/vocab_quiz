@@ -7,7 +7,7 @@ import vocabData from '@/data/vocab.json';
 
 const STORAGE_KEY = 'vocab-quiz-incorrect-answers';
 
-export function useQuiz(reviewMode: boolean = false) {
+export function useQuiz(reviewMode: boolean = false, timerEnabled: boolean = true, timerDuration: number = 30) {
   const [quizState, setQuizState] = useState<QuizState>({
     questions: [],
     currentQuestionIndex: 0,
@@ -23,7 +23,7 @@ export function useQuiz(reviewMode: boolean = false) {
     isCorrect: boolean;
     correctAnswer?: string;
   }>({ show: false, isCorrect: false });
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(timerDuration);
   const [isTimerActive, setIsTimerActive] = useState(false);
 
   // クイズの初期化
@@ -53,9 +53,9 @@ export function useQuiz(reviewMode: boolean = false) {
         correctAnswers: new Array(questions.length).fill(false)
       }));
       
-      // タイマーを開始
-      if (questions.length > 0) {
-        setTimeLeft(5);
+      // タイマーを開始（タイマーが有効な場合のみ）
+      if (questions.length > 0 && timerEnabled) {
+        setTimeLeft(timerDuration);
         setIsTimerActive(true);
       }
     };
@@ -65,7 +65,7 @@ export function useQuiz(reviewMode: boolean = false) {
 
   // タイマー管理
   useEffect(() => {
-    if (!isTimerActive || timeLeft === 0) return;
+    if (!timerEnabled || !isTimerActive || timeLeft === 0) return;
 
     const timer = setTimeout(() => {
       if (timeLeft === 1) {
@@ -77,7 +77,7 @@ export function useQuiz(reviewMode: boolean = false) {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [isTimerActive, timeLeft]);
+  }, [timerEnabled, isTimerActive, timeLeft]);
 
   // タイムアウト処理
   const handleTimeout = () => {
@@ -110,7 +110,7 @@ export function useQuiz(reviewMode: boolean = false) {
 
   // 答えを提出
   const submitAnswer = () => {
-    setIsTimerActive(false);
+    if (timerEnabled) setIsTimerActive(false);
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
     const isCorrect = currentAnswer.toLowerCase().trim() === currentQuestion.answer.toLowerCase().trim();
 
@@ -142,7 +142,7 @@ export function useQuiz(reviewMode: boolean = false) {
 
   // わからない（スキップ）
   const skipQuestion = () => {
-    setIsTimerActive(false);
+    if (timerEnabled) setIsTimerActive(false);
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
 
     // 状態を更新（不正解として扱う）
@@ -185,9 +185,11 @@ export function useQuiz(reviewMode: boolean = false) {
       }));
       setCurrentAnswer('');
       setFeedback({ show: false, isCorrect: false });
-      // 新しい問題のタイマーを開始
-      setTimeLeft(5);
-      setIsTimerActive(true);
+      // 新しい問題のタイマーを開始（タイマーが有効な場合のみ）
+      if (timerEnabled) {
+        setTimeLeft(timerDuration);
+        setIsTimerActive(true);
+      }
     }
   };
 

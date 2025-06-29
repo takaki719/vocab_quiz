@@ -11,6 +11,8 @@ export default function Quiz() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reviewMode = searchParams.get('mode') === 'review';
+  const timerEnabled = searchParams.get('timer') !== 'false';
+  const timerDuration = Number(searchParams.get('duration')) || 30;
   
   const {
     quizState,
@@ -24,7 +26,7 @@ export default function Quiz() {
     nextQuestion,
     getResult,
     getCurrentStats
-  } = useQuiz(reviewMode);
+  } = useQuiz(reviewMode, timerEnabled, timerDuration);
 
   // クイズが完了したら結果ページへ
   useEffect(() => {

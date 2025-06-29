@@ -23,6 +23,8 @@ export function useQuiz(reviewMode: boolean = false) {
     isCorrect: boolean;
     correctAnswer?: string;
   }>({ show: false, isCorrect: false });
+  const [timeLeft, setTimeLeft] = useState(5);
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
   // クイズの初期化
   useEffect(() => {
@@ -50,13 +52,65 @@ export function useQuiz(reviewMode: boolean = false) {
         userAnswers: new Array(questions.length).fill(''),
         correctAnswers: new Array(questions.length).fill(false)
       }));
+      
+      // タイマーを開始
+      if (questions.length > 0) {
+        setTimeLeft(5);
+        setIsTimerActive(true);
+      }
     };
 
     initializeQuiz();
   }, [reviewMode]);
 
+  // タイマー管理
+  useEffect(() => {
+    if (!isTimerActive || timeLeft === 0) return;
+
+    const timer = setTimeout(() => {
+      if (timeLeft === 1) {
+        // タイムアウト - 自動的に間違いとして処理
+        handleTimeout();
+      } else {
+        setTimeLeft(timeLeft - 1);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isTimerActive, timeLeft]);
+
+  // タイムアウト処理
+  const handleTimeout = () => {
+    setIsTimerActive(false);
+    const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
+
+    // 状態を更新（不正解として扱う）
+    const newUserAnswers = [...quizState.userAnswers];
+    const newCorrectAnswers = [...quizState.correctAnswers];
+    
+    newUserAnswers[quizState.currentQuestionIndex] = 'タイムアウト';
+    newCorrectAnswers[quizState.currentQuestionIndex] = false;
+
+    setQuizState(prev => ({
+      ...prev,
+      userAnswers: newUserAnswers,
+      correctAnswers: newCorrectAnswers
+    }));
+
+    // すぐに復習問題として保存
+    saveIncorrectAnswer(currentQuestion);
+
+    // フィードバックを表示
+    setFeedback({
+      show: true,
+      isCorrect: false,
+      correctAnswer: currentQuestion.answer
+    });
+  };
+
   // 答えを提出
   const submitAnswer = () => {
+    setIsTimerActive(false);
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
     const isCorrect = currentAnswer.toLowerCase().trim() === currentQuestion.answer.toLowerCase().trim();
 
@@ -88,6 +142,7 @@ export function useQuiz(reviewMode: boolean = false) {
 
   // わからない（スキップ）
   const skipQuestion = () => {
+    setIsTimerActive(false);
     const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
 
     // 状態を更新（不正解として扱う）
@@ -130,6 +185,9 @@ export function useQuiz(reviewMode: boolean = false) {
       }));
       setCurrentAnswer('');
       setFeedback({ show: false, isCorrect: false });
+      // 新しい問題のタイマーを開始
+      setTimeLeft(5);
+      setIsTimerActive(true);
     }
   };
 
@@ -214,6 +272,8 @@ export function useQuiz(reviewMode: boolean = false) {
     currentAnswer,
     setCurrentAnswer,
     feedback,
+    timeLeft,
+    isTimerActive,
     submitAnswer,
     skipQuestion,
     nextQuestion,

@@ -15,6 +15,8 @@ interface QuizCardProps {
     correctAnswer?: string;
   };
   onNext?: () => void;
+  timeLeft?: number;
+  isTimerActive?: boolean;
 }
 
 export default function QuizCard({ 
@@ -24,7 +26,9 @@ export default function QuizCard({
   onSubmit,
   onSkip,
   feedback,
-  onNext
+  onNext,
+  timeLeft,
+  isTimerActive
 }: QuizCardProps) {
   const displaySentence = createBlankSentence(question.sentence, question.answer);
 
@@ -35,7 +39,7 @@ export default function QuizCard({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !feedback?.show && userAnswer.trim()) {
       onSubmit();
     }
@@ -43,6 +47,15 @@ export default function QuizCard({
 
   return (
     <div className="quiz-card max-w-2xl mx-auto">
+      {isTimerActive && timeLeft !== undefined && (
+        <div className="mb-4 text-center">
+          <div className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold ${
+            timeLeft <= 2 ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+          }`}>
+            ⏰ 残り時間: {timeLeft}秒
+          </div>
+        </div>
+      )}
       <div className="mb-6">
         <p className="text-lg text-gray-800 leading-relaxed">
           {displaySentence}
@@ -56,7 +69,7 @@ export default function QuizCard({
               type="text"
               value={userAnswer}
               onChange={(e) => onAnswerChange(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder="答えを入力してください..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               autoFocus
@@ -103,7 +116,8 @@ export default function QuizCard({
             )}
             <p className="text-gray-600 text-sm mt-2">
               あなたの答え: <span className="font-medium">
-                {userAnswer === 'わからない' ? '❓ わからない' : userAnswer}
+                {userAnswer === 'わからない' ? '❓ わからない' : 
+                 userAnswer === 'タイムアウト' ? '⏰ タイムアウト' : userAnswer}
               </span>
             </p>
           </div>

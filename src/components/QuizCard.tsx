@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { VocabQuestion } from '@/types/vocab';
 import { createBlankSentence } from '@/utils/placeholder';
 import Button from './Button';
+import TimerGauge from './TimerGauge';
 
 interface QuizCardProps {
   question: VocabQuestion;
@@ -17,6 +18,7 @@ interface QuizCardProps {
   onNext?: () => void;
   timeLeft?: number;
   isTimerActive?: boolean;
+  totalTime?: number;
 }
 
 export default function QuizCard({ 
@@ -28,7 +30,8 @@ export default function QuizCard({
   feedback,
   onNext,
   timeLeft,
-  isTimerActive
+  isTimerActive,
+  totalTime
 }: QuizCardProps) {
   const displaySentence = createBlankSentence(question.sentence, question.answer);
 
@@ -47,13 +50,13 @@ export default function QuizCard({
 
   return (
     <div className="quiz-card max-w-2xl mx-auto">
-      {isTimerActive && timeLeft !== undefined && timeLeft > 0 && (
-        <div className="mb-4 text-center">
-          <div className={`inline-flex items-center px-4 py-2 rounded-lg font-semibold ${
-            timeLeft <= 2 ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
-          }`}>
-            ⏰ 残り時間: {timeLeft}秒
-          </div>
+      {isTimerActive && timeLeft !== undefined && timeLeft > 0 && totalTime && (
+        <div className="mb-6 flex justify-center">
+          <TimerGauge 
+            timeLeft={timeLeft} 
+            totalTime={totalTime} 
+            isActive={isTimerActive} 
+          />
         </div>
       )}
       <div className="mb-6">

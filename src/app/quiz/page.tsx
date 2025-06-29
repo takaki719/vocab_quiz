@@ -21,6 +21,7 @@ export default function Quiz() {
     feedback,
     timeLeft,
     isTimerActive,
+    totalTime,
     submitAnswer,
     skipQuestion,
     nextQuestion,
@@ -106,6 +107,7 @@ export default function Quiz() {
         onNext={nextQuestion}
         timeLeft={timeLeft}
         isTimerActive={isTimerActive}
+        totalTime={totalTime}
       />
 
       {reviewMode && (

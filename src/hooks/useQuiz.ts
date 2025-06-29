@@ -276,6 +276,7 @@ export function useQuiz(reviewMode: boolean = false, timerEnabled: boolean = tru
     feedback,
     timeLeft,
     isTimerActive,
+    totalTime: timerDuration,
     submitAnswer,
     skipQuestion,
     nextQuestion,
